@@ -1,7 +1,7 @@
 package org.abg.batchapi.batch;
 
-import org.abg.batchapi.dto.VisitorDto;
 import org.abg.batchapi.entities.Visitor;
+import org.abg.batchapi.repositories.VisitorRepository;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,19 +16,17 @@ public class VisitorItemProcessor implements ItemProcessor<Visitor, Visitor> {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private VisitorRepository visitorRepository;
 
-    public VisitorItemProcessor(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-
-    }
+//    public VisitorItemProcessor(RestTemplate restTemplate) {
+//        this.restTemplate = restTemplate;
+//
+//    }
 
     @Override
-    public Visitor process(Visitor item) throws Exception {
-        item.setVisitDate(dateFormat.parse(item.getStrVisitDate()));
-        String uri = "https://localhost.com/api/getData";
-        VisitorDto result = restTemplate.postForEntity(uri, item, VisitorDto.class).getBody();
-        assert result != null;
-        item.setStrVisitDate(result.getVisitDate().toString());
+    public Visitor process(Visitor item) {
+        item.setAddress("ABG Egypt");
         return item;
     }
 

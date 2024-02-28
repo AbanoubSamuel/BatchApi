@@ -1,7 +1,9 @@
 package org.abg.batchapi.batch;
 
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.abg.batchapi.entities.Visitor;
+import org.abg.batchapi.repositories.VisitorPagingRepository;
 import org.abg.batchapi.repositories.VisitorRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -13,26 +15,29 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
+
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
+
 @Configuration
-@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "platformTransactionManager")
 @RequiredArgsConstructor
 public class BatchConfig extends DefaultBatchConfiguration {
 
-    @Autowired
-    private Visitor visitor;
+
     @Autowired
     private JobRepository jobRepository;
     @Autowired
@@ -46,46 +51,47 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
 
     @Bean
-    public Visitor visitors() {
-        return new Visitor();
-    }
-
-    @Bean
     public Job importVisitorsJob() {
         return new JobBuilder("importVisitorsJob", jobRepository)
-                .start(importVisitorsStep(jobRepository, visitor, transactionManager))
+                .start(importVisitorsStep(jobRepository, transactionManager))
                 .build();
     }
 
     @Bean
-    public Step importVisitorsStep(JobRepository jobRepository, Visitor visitor, PlatformTransactionManager transactionManager) {
+    public Step importVisitorsStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("importVisitorsStep", jobRepository)
-                .<Visitor, Visitor>chunk(100, transactionManager)
+                .<Visitor, Visitor>chunk(200, transactionManager)
                 .reader(visitorItemReader)
-                .processor(itemProcessor(restTemplate))
-                .writer(itemWriter())
+                .processor(itemProcessor())
+                .writer(itemWriter(visitorRepository))
                 .build();
     }
 
     @Bean
-    public ItemProcessor<Visitor, Visitor> itemProcessor(RestTemplate restTemplate) {
-        return new VisitorItemProcessor(restTemplate);
+    public RepositoryItemReader<Visitor> itemReader(EntityManagerFactory entityManagerFactory,
+                                                    VisitorPagingRepository visitorPagingRepository) {
+        return new RepositoryItemReaderBuilder<Visitor>()
+                .name("itemReader")
+                .pageSize(200)
+                .repository(visitorPagingRepository)
+                .methodName("findAll")
+                .sorts(Map.of("id", Sort.Direction.ASC))
+                .build();
     }
 
     @Bean
-    public ItemWriter<Visitor> itemWriter() {
-        return visitorRepository::saveAll;
+    public ItemProcessor<Visitor, Visitor> itemProcessor() {
+        return new VisitorItemProcessor();
     }
 
     @Bean
-    public FlatFileItemReader<Visitor> flatFileItemReader(@Value("${inputFile}") Resource inputFile) {
-        FlatFileItemReader<Visitor> flatFileItemReader = new FlatFileItemReader<>();
-        flatFileItemReader.setName("DEVAL");
-        flatFileItemReader.setLinesToSkip(1);
-        flatFileItemReader.setResource(inputFile);
-        flatFileItemReader.setLineMapper(lineMapper());
-        return flatFileItemReader;
+    public ItemWriter<Visitor> itemWriter(VisitorRepository repository) {
+        return new RepositoryItemWriterBuilder<Visitor>()
+                .repository(repository)
+                .methodName("save")
+                .build();
     }
+
 
     @Bean
     public LineMapper<Visitor> lineMapper() {
