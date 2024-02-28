@@ -1,8 +1,6 @@
 package org.abg.batchapi.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -17,6 +15,8 @@ import java.util.Objects;
 @ToString
 public class Visitor {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
     private String firstName;
     private String lastName;
