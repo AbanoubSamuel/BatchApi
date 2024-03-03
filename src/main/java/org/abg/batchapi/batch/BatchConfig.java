@@ -14,8 +14,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
 import org.springframework.batch.item.file.LineMapper;
@@ -51,15 +51,16 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
 
     @Bean
-    public Job importVisitorsJob() {
+    public Job updateVisitorJob() {
         return new JobBuilder("importVisitorsJob", jobRepository)
-                .start(importVisitorsStep(jobRepository, transactionManager))
+                .start(updateVisitorAddressStep(jobRepository, transactionManager))
                 .build();
     }
 
+
     @Bean
-    public Step importVisitorsStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("importVisitorsStep", jobRepository)
+    public Step updateVisitorAddressStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("updateVisitorAddressStep", jobRepository)
                 .<Visitor, Visitor>chunk(200, transactionManager)
                 .reader(visitorItemReader)
                 .processor(itemProcessor())
@@ -72,9 +73,9 @@ public class BatchConfig extends DefaultBatchConfiguration {
                                                     VisitorPagingRepository visitorPagingRepository) {
         return new RepositoryItemReaderBuilder<Visitor>()
                 .name("itemReader")
-                .pageSize(200)
                 .repository(visitorPagingRepository)
                 .methodName("findAll")
+                .pageSize(200)
                 .sorts(Map.of("id", Sort.Direction.ASC))
                 .build();
     }
@@ -85,7 +86,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
     }
 
     @Bean
-    public ItemWriter<Visitor> itemWriter(VisitorRepository repository) {
+    public RepositoryItemWriter<Visitor> itemWriter(VisitorRepository repository) {
         return new RepositoryItemWriterBuilder<Visitor>()
                 .repository(repository)
                 .methodName("save")
