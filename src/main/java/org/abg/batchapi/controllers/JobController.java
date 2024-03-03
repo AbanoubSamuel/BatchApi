@@ -1,4 +1,4 @@
-package org.abg.batchapi.controller;
+package org.abg.batchapi.controllers;
 
 import org.abg.batchapi.utls.JsonResponse;
 import org.springframework.batch.core.*;
