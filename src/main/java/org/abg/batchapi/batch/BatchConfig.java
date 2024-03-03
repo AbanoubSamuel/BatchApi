@@ -82,7 +82,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public ItemProcessor<Visitor, Visitor> itemProcessor() {
-        return new VisitorItemProcessor();
+        return new VisitorItemProcessor(restTemplate);
     }
 
     @Bean
