@@ -25,6 +25,8 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.transaction.PlatformTransactionManager;
@@ -65,6 +67,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
                 .reader(visitorItemReader)
                 .processor(itemProcessor())
                 .writer(itemWriter(visitorRepository))
+                .taskExecutor(taskExecutor())
                 .build();
     }
 
@@ -106,6 +109,11 @@ public class BatchConfig extends DefaultBatchConfiguration {
         fieldSetMapper.setTargetType(Visitor.class);
         defaultLineMapper.setFieldSetMapper(fieldSetMapper);
         return defaultLineMapper;
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor("spring_batch");
     }
 
 }

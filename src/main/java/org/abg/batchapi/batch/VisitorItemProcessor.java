@@ -22,12 +22,11 @@ public class VisitorItemProcessor implements ItemProcessor<Visitor, Visitor> {
 
     public VisitorItemProcessor(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-
     }
 
     @Override
     public Visitor process(Visitor item) {
-        String uri = "https://mocki.io/v1/2fc4f536-3633-42e1-9b60-8f2fd315c81a";
+        String uri = "https://mocki.io/v1/dbc5d55d-1470-438a-a7ee-b4df8bef404a";
         JsonResponse jsonResponse = restTemplate.getForEntity(uri, JsonResponse.class).getBody();
         assert jsonResponse != null;
         assert jsonResponse.getData() != null;
