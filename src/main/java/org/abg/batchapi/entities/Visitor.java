@@ -2,6 +2,7 @@ package org.abg.batchapi.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@DynamicUpdate
 public class Visitor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

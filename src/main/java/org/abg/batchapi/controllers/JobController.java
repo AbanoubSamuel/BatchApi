@@ -20,7 +20,7 @@ public class JobController {
     private JobLauncher jobLauncher;
 
     @Autowired
-    private Job importVisitorsJob;
+    private Job updateVisitorAddressJob;
 
     @GetMapping("/runJob")
     public ResponseEntity<JsonResponse<String>> load()
@@ -28,7 +28,7 @@ public class JobController {
             JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder().addDate("timestamp", Calendar.getInstance().getTime())
                 .toJobParameters();
-        JobExecution jobExecution = jobLauncher.run(importVisitorsJob, jobParameters);
+        JobExecution jobExecution = jobLauncher.run(updateVisitorAddressJob, jobParameters);
         while (jobExecution.isRunning()) {
             System.out.println("Job Executing.....");
         }
