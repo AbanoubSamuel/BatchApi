@@ -53,8 +53,8 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
 
     @Bean
-    public Job updateVisitorJob() {
-        return new JobBuilder("importVisitorsJob", jobRepository)
+    public Job updateVisitorAddressJob() {
+        return new JobBuilder("updateVisitorAddressJob", jobRepository)
                 .start(updateVisitorAddressStep(jobRepository, transactionManager))
                 .build();
     }
@@ -94,21 +94,6 @@ public class BatchConfig extends DefaultBatchConfiguration {
                 .repository(repository)
                 .methodName("save")
                 .build();
-    }
-
-
-    @Bean
-    public LineMapper<Visitor> lineMapper() {
-        DefaultLineMapper<Visitor> defaultLineMapper = new DefaultLineMapper<>();
-        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setDelimiter(",");
-        lineTokenizer.setNames("id", "firstName", "lastName", "emailAddress", "phoneNumber", "address", "strVisitDate");
-        lineTokenizer.setStrict(false); // Set strict property to false
-        defaultLineMapper.setLineTokenizer(lineTokenizer);
-        BeanWrapperFieldSetMapper<Visitor> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(Visitor.class);
-        defaultLineMapper.setFieldSetMapper(fieldSetMapper);
-        return defaultLineMapper;
     }
 
     @Bean
