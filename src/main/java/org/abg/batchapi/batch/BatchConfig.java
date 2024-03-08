@@ -18,10 +18,6 @@ import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
-import org.springframework.batch.item.file.LineMapper;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +31,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Configuration
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "platformTransactionManager")
 @RequiredArgsConstructor
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "platformTransactionManager")
 public class BatchConfig extends DefaultBatchConfiguration {
 
 
@@ -54,17 +50,17 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public Job updateVisitorAddressJob() {
-        return new JobBuilder("updateVisitorAddressJob", jobRepository)
-                .start(updateVisitorAddressStep(jobRepository, transactionManager))
-                .build();
+        return new JobBuilder("updateVisitorAddressJob", jobRepository).start(
+                updateVisitorAddressStep(jobRepository, transactionManager)).build();
     }
 
 
     @Bean
     public Step updateVisitorAddressStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("updateVisitorAddressStep", jobRepository)
-                .<Visitor, Visitor>chunk(200, transactionManager)
-                .reader(visitorItemReader)
+        return new StepBuilder("updateVisitorAddressStep", jobRepository).<Visitor, Visitor>chunk(
+                        200,
+                        transactionManager
+                ).reader(visitorItemReader)
                 .processor(itemProcessor())
                 .writer(itemWriter(visitorRepository))
                 .taskExecutor(taskExecutor())
@@ -72,10 +68,8 @@ public class BatchConfig extends DefaultBatchConfiguration {
     }
 
     @Bean
-    public RepositoryItemReader<Visitor> itemReader(EntityManagerFactory entityManagerFactory,
-                                                    VisitorPagingRepository visitorPagingRepository) {
-        return new RepositoryItemReaderBuilder<Visitor>()
-                .name("itemReader")
+    public RepositoryItemReader<Visitor> itemReader(EntityManagerFactory entityManagerFactory, VisitorPagingRepository visitorPagingRepository) {
+        return new RepositoryItemReaderBuilder<Visitor>().name("itemReader")
                 .repository(visitorPagingRepository)
                 .methodName("findAll")
                 .pageSize(200)
@@ -90,10 +84,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public RepositoryItemWriter<Visitor> itemWriter(VisitorRepository repository) {
-        return new RepositoryItemWriterBuilder<Visitor>()
-                .repository(repository)
-                .methodName("save")
-                .build();
+        return new RepositoryItemWriterBuilder<Visitor>().repository(repository).methodName("save").build();
     }
 
     @Bean
@@ -102,3 +93,5 @@ public class BatchConfig extends DefaultBatchConfiguration {
     }
 
 }
+
+
