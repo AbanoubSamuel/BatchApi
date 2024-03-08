@@ -1,7 +1,7 @@
-package org.abg.batchapi.mappers;
+package org.abg.batchapi.mapper;
 
 import org.abg.batchapi.dto.VisitorDto;
-import org.abg.batchapi.entities.Visitor;
+import org.abg.batchapi.entity.Visitor;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)

@@ -2,9 +2,9 @@ package org.abg.batchapi.batch;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.abg.batchapi.entities.Visitor;
-import org.abg.batchapi.repositories.VisitorPagingRepository;
-import org.abg.batchapi.repositories.VisitorRepository;
+import org.abg.batchapi.entity.Visitor;
+import org.abg.batchapi.repository.VisitorPagingRepository;
+import org.abg.batchapi.repository.VisitorRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -50,7 +50,8 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public Job updateVisitorAddressJob() {
-        return new JobBuilder("updateVisitorAddressJob", jobRepository).start(updateVisitorAddressStep(jobRepository,
+        return new JobBuilder("updateVisitorAddressJob", jobRepository).start(updateVisitorAddressStep(
+                jobRepository,
                 transactionManager
         )).build();
     }
@@ -58,10 +59,10 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public Step updateVisitorAddressStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("updateVisitorAddressStep", jobRepository).<Visitor, Visitor>chunk(200,
+        return new StepBuilder("updateVisitorAddressStep", jobRepository).<Visitor, Visitor>chunk(
+                        200,
                         transactionManager
-                )
-                .reader(visitorItemReader)
+                ).reader(visitorItemReader)
                 .processor(itemProcessor())
                 .writer(itemWriter(visitorRepository))
                 .taskExecutor(taskExecutor())
