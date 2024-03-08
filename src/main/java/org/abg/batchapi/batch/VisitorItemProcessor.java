@@ -1,6 +1,6 @@
 package org.abg.batchapi.batch;
 
-import org.abg.batchapi.entities.Visitor;
+import org.abg.batchapi.entity.Visitor;
 import org.abg.batchapi.utls.JsonResponse;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;

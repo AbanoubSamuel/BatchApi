@@ -1,4 +1,4 @@
-package org.abg.batchapi.entities;
+package org.abg.batchapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

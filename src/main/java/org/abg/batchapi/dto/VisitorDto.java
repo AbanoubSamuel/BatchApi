@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * DTO for {@link org.abg.batchapi.entities.Visitor}
+ * DTO for {@link org.abg.batchapi.entity.Visitor}
  */
 @Value
 @JsonIgnoreProperties(ignoreUnknown = true)
