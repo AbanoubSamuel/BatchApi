@@ -50,17 +50,18 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public Job updateVisitorAddressJob() {
-        return new JobBuilder("updateVisitorAddressJob", jobRepository).start(
-                updateVisitorAddressStep(jobRepository, transactionManager)).build();
+        return new JobBuilder("updateVisitorAddressJob", jobRepository).start(updateVisitorAddressStep(jobRepository,
+                transactionManager
+        )).build();
     }
 
 
     @Bean
     public Step updateVisitorAddressStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("updateVisitorAddressStep", jobRepository).<Visitor, Visitor>chunk(
-                        200,
+        return new StepBuilder("updateVisitorAddressStep", jobRepository).<Visitor, Visitor>chunk(200,
                         transactionManager
-                ).reader(visitorItemReader)
+                )
+                .reader(visitorItemReader)
                 .processor(itemProcessor())
                 .writer(itemWriter(visitorRepository))
                 .taskExecutor(taskExecutor())
